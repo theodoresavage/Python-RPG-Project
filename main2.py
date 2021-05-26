@@ -1,30 +1,11 @@
 
 import random
 
-warrior = {
-    'name' : 'warrior',
-    'potion' : 3,
-    'atk' : 7,
-    'def' : 7,
-    'hp' : 20,
-    'id' : 0
-}
 
-zombie = {
-    'name' : 'zombie',
-    'atk' : 10,
-    'def' : 2,
-    'hp' : 8,
-    'id' : 1
-}
+tier1_creatures = ['Bat','Wolf','Giant Wasp']
+tier2_creatures = ['Zombie','Warrior','Death Hound']
+tier3_creatures = ['Basilisk','Witch','Dragon']
 
-bat = {
-    'name' : 'bat',
-    'atk' : 3,
-    'def' : 2,
-    'hp' : 4,
-    'id' : 2
-}
 
 class StatBlock:
     def __init__(self, attack, defense, hp):
@@ -52,54 +33,92 @@ class Player(StatBlock):
         print('One potion has been used')
         return -1
 
-class Warrior(StatBlock):
-    def __init__(self, name, potion, attack, defense, hp):
+class Enemy(StatBlock):
+    def __init__(self, name = ' ', attack = 0, defense = 0, hp = 0):
         super().__init__(attack, defense, hp)
         self._name = name
-        self._potion = potion
-
-    def healing(self):
-        return 5
-    
-    def remove_potions(self):
-        return -1
-
-class Scorpion(StatBlock):
-    def __init__(self, name, poison, attack, defense, hp):
-        super().__init__(attack, defense, hp)
-        self._name = name
-        self._poison_count = poison
-    
-    def poison(self):
-        return 1
-
-class Bat(StatBlock):
-    def __init__(self, name, attack, defense, hp):
-        super().__init__(attack, defense, hp)
-        self._name = name
-
-potion_count = 0
 
 player_hp = 50
 
-while player_hp > 0:
+enemy_tier = 0
+enemy_count = 0
 
-    enemy_count = random.randrange(0, 11)
+enemy1 = 0
+enemy2 = 0
+enemy3 = 0
 
-    if enemy_count > 8:
-        enemy1 = Warrior(warrior.get('name'), warrior.get('potion'), warrior.get('atk'), warrior.get('def'), warrior.get('hp'))
-        enemy2 = Warrior(warrior.get('name'), warrior.get('potion'), warrior.get('atk'), warrior.get('def'), warrior.get('hp'))
-        enemy3 = Warrior(warrior.get('name'), warrior.get('potion'), warrior.get('atk'), warrior.get('def'), warrior.get('hp'))
+def hp_generation(num1):
+    return random.randrange(5,11) + num1
+ 
+def attack_generation(num1):
+    return (random.randrange(3,11) + num1)
 
-    elif enemy_count > 5:
-        enemy1 = Warrior(warrior.get('name'), warrior.get('potion'), warrior.get('atk'), warrior.get('def'), warrior.get('hp'))
-        enemy2 = Warrior(warrior.get('name'), warrior.get('potion'), warrior.get('atk'), warrior.get('def'), warrior.get('hp'))
-        enemy3 = 'No Enemy Here'
-        
+def defense_generation(num1):
+    return (random.randrange(3,11) + num1)
+
+def potion_generation(num1):
+    pass
+
+def enemy_encounter_level():
+    global enemy_tier
+    enemy_tier = random.randrange(1,11)
+
+def enemy_total():
+    global enemy_count
+    enemy_count = random.randrange(1,11)
+
+def creature_generator(creature):
+    
+    enemy_encounter_level()
+
+    if enemy_tier > 9:
+        creature = Enemy(creature_name(tier3_creatures),attack_generation(10),defense_generation(10),hp_generation(10))
+
+    elif enemy_tier > 7:
+        creature = Enemy(creature_name(tier2_creatures),attack_generation(5),defense_generation(5),hp_generation(5))
+
     else:
-        enemy1 = Warrior(warrior.get('name'), warrior.get('potion'), warrior.get('atk'), warrior.get('def'), warrior.get('hp'))
-        enemy2 = 'No Enemy Here'
-        enemy3 = 'No Enemy Here'
-        
+        creature = Enemy(creature_name(tier1_creatures),attack_generation(0),defense_generation(0),hp_generation(0))
+    
+    return creature
+
+def creature_name(tier):
+    return tier[random.randrange(0,len(tier))]
+
+def print_stat_block(creature):
+    print(f'{creature._name} - HP: {creature._hp} ATK: {creature._attack} DEF: {creature._defense}')
+
+def creature_party_generator():
+    global enemy_count
+    global enemy1
+    global enemy2
+    global enemy3
+
+    enemy_total()
+
+    if enemy_count > 9:
+        enemy1 = creature_generator(enemy1)
+        enemy2 = creature_generator(enemy2)
+        enemy3 = creature_generator(enemy3)
+        print(f'You are facing a {enemy1._name}, a {enemy2._name}, and a {enemy3._name}\n')
+        print('Their stats are as follows: \n')
+        print_stat_block(enemy1)
+        print_stat_block(enemy2)
+        print_stat_block(enemy3)
+
+    elif enemy_count > 6:
+        enemy1 = creature_generator(enemy1)
+        enemy2 = creature_generator(enemy2)
+        print(f'You are facing a {enemy1._name} and a {enemy2._name}\n')
+        print('Their stats are as follows: \n')
+        print_stat_block(enemy1)
+        print_stat_block(enemy2)
+
+    else:
+        enemy1 = creature_generator(enemy1)
+        print(f'You are facing a {enemy1._name}\n')
+        print('Their stats are as follows: \n')
+        print_stat_block(enemy1)
 
 
+creature_party_generator()
